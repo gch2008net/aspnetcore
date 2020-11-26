@@ -3,18 +3,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
 {
@@ -100,7 +100,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
             context.ServerOptions.OptionsInUse.Add(endpoint);
         }
 
-        internal static ListenOptions ParseAddress(string? address, out bool https)
+        internal static ListenOptions ParseAddress(string address, out bool https)
         {
             var parsedAddress = BindingAddress.Parse(address);
             https = false;
