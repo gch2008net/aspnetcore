@@ -20,7 +20,6 @@ namespace Microsoft.AspNetCore.Http
             Scheme = scheme;
         }
 
-        // Important: Make this method private when removing it.
         [Obsolete("This constructor is obsolete and will be removed in a future version. Use BindingAddress.Parse(address) to create a BindingAddress instance.")]
         public BindingAddress()
         {
