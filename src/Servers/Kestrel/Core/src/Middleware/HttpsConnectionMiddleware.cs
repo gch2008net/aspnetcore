@@ -146,7 +146,9 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Https.Internal
             context.Features.Set<ITlsConnectionFeature>(feature);
             context.Features.Set<ITlsHandshakeFeature>(feature);
 
-            var sslDuplexPipe = CreateSslDuplexPipe(context.Transport, context.Features.Get<IMemoryPoolFeature>()?.MemoryPool);
+            var sslDuplexPipe = CreateSslDuplexPipe(
+                context.Transport,
+                context.Features.Get<IMemoryPoolFeature>()?.MemoryPool ?? MemoryPool<byte>.Shared);
             var sslStream = sslDuplexPipe.Stream;
 
             try
@@ -403,27 +405,15 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Https.Internal
             return RemoteCertificateValidationCallback(_options.ClientCertificateMode, _options.ClientCertificateValidation, certificate, chain, sslPolicyErrors);
         }
 
-        private SslDuplexPipe CreateSslDuplexPipe(IDuplexPipe transport, MemoryPool<byte>? memoryPool)
+        private SslDuplexPipe CreateSslDuplexPipe(IDuplexPipe transport, MemoryPool<byte> memoryPool)
         {
-            StreamPipeReaderOptions inputPipeOptions;
-
-            if (memoryPool != null)
-            {
-                inputPipeOptions = new StreamPipeReaderOptions
-                (
-                    pool: memoryPool,
-                    bufferSize: memoryPool.GetMinimumSegmentSize(),
-                    minimumReadSize: memoryPool.GetMinimumAllocSize(),
-                    leaveOpen: true
-                );
-            }
-            else
-            {
-                inputPipeOptions = new StreamPipeReaderOptions
-                (
-                    leaveOpen: true
-                );
-            }
+            StreamPipeReaderOptions inputPipeOptions = new StreamPipeReaderOptions
+            (
+                pool: memoryPool,
+                bufferSize: memoryPool.GetMinimumSegmentSize(),
+                minimumReadSize: memoryPool.GetMinimumAllocSize(),
+                leaveOpen: true
+            );
 
             var outputPipeOptions = new StreamPipeWriterOptions
             (
